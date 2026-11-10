@@ -13,7 +13,7 @@ public:
         for (int i = 0; i < NP; ++i)
         {
             auto* par = p.apvts.getParameter (paramIds[i]);
-            auto lab = std::make_unique<juce::Label> ({}, par->getName (24));
+            auto lab = std::make_unique<juce::Label> (juce::String(), par->getName (24));
             lab->setJustificationType (juce::Justification::centred);
             lab->setColour (juce::Label::textColourId, juce::Colour (0xffb09c78));
             lab->setFont (juce::FontOptions (12.f));
