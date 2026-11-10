@@ -1,12 +1,34 @@
 #pragma once
-#include <juce_audio_utils/juce_audio_utils.h>
-#include <juce_dsp/juce_dsp.h>
+#include "Common/KomodoDsp.h"
 
 // Orden = indices de parametros (el editor los recorre en este orden)
-enum { R0, R1, R2, W0, W1, W2, D1, D2, L0, L1, L2, NZ, CUT, RES, AMT, FA, FD, FS,
-       AA, AD, AS, DEC, GL, LR, LA, VOL, NP };
-inline const char* const paramIds[NP] = { "r0","r1","r2","w0","w1","w2","d1","d2","l0","l1","l2","nz",
-       "cut","res","amt","fa","fd","fs","aa","ad","as","dec","gl","lr","la","vol" };
+enum { R0, R1, R2, W0, W1, W2, MODE, LSH, CHO,
+       D1, D2, L0, L1, L2, NZ,
+       CUT, RES, AMT, KEY, LFF,
+       FA, FD, FS, AA, AD, AS, DEC,
+       GL, LR, LA, VOL, NP };
+inline const char* const paramIds[NP] = {
+       "r0","r1","r2","w0","w1","w2","mode","lsh","cho",
+       "d1","d2","l0","l1","l2","nz",
+       "cut","res","amt","key","lff",
+       "fa","fd","fs","aa","ad","as","dec",
+       "gl","lr","la","vol" };
+
+constexpr int kVoices = 6;
+
+struct Voice
+{
+    int note = -1;
+    bool released = false, sustained = false;
+    unsigned age = 0;
+    float vel = 1.f, tgtF = 110.f, curF = 110.f;
+    float ph[3] {};
+    float s1 = 0.f, s2 = 0.f, s3 = 0.f, s4 = 0.f;       // filtro ladder de 4 polos
+    float gAmp = 0.f, g = 0.1f;                         // valores del tick anterior (para rampa)
+    Env amp, flt;
+
+    bool free() const noexcept { return amp.st == 0; }
+};
 
 class MiniKomodoAudioProcessor : public juce::AudioProcessor
 {
@@ -36,17 +58,26 @@ public:
 
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout layout();
+    void readParams();
     void handle (const juce::MidiMessage&);
-    void render (float* out, int n);
+    void noteOn (int n, float vel);
+    void noteOff (int n);
+    void releaseAll();
+    void renderVoice (Voice&, float* out, int n);
 
     std::atomic<float>* pp[NP] {};
-    juce::dsp::LadderFilter<float> ladder;
-    juce::ADSR ampEnv, fltEnv;
-    juce::Random rng;
-    std::vector<int> held;
+    Voice voices[kVoices];
+    Chorus chorus;
+    int held[32] {}, nHeld = 0, mode = 0, lastMode = 0, cho = 0, lsh = 0, wf[3] {};
+    unsigned ageCounter = 0, rngState = 22222u, shState = 777u;
+    bool sustain = false;
     double sr = 44100.0;
-    float ph[3] {}, lfoPh = 0.f, curF = 110.f, tgtF = 110.f;
-    float tmp[16] {}, ae[16] {};
+    float invSr = 1.f / 44100.f, bend = 0.f, modWheel = 0.f, lfoPh = 0.f, lfo = 0.f, shVal = 0.f;
+
+    // parametros ya convertidos (una vez por bloque)
+    float mul[3] { 1.f, 1.f, 1.f }, lv[3] {}, noise = 0, vibCents = 0, lfoInc = 0, glideC = 1, gain = 0;
+    float cut = 1500, res = 0, amt = 0, keyAmt = 0, lffAmt = 0;
+    EnvP ampP, fltP;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MiniKomodoAudioProcessor)
 };
