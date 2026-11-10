@@ -1,0 +1,59 @@
+name: Build MiniKomodo VST3
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-vst3:
+    name: Build Windows VST3
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Download JUCE
+        shell: pwsh
+        run: |
+          git clone --depth 1 https://github.com/juce-framework/JUCE.git JUCE
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build VST3
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --target MiniKomodo_VST3 --parallel
+
+      - name: Collect VST3
+        shell: pwsh
+        run: |
+          $plugin = Get-ChildItem -Path "build" -Recurse -Directory -Filter "*.vst3" |
+            Where-Object { $_.Name -eq "MiniKomodo.vst3" } |
+            Select-Object -First 1
+
+          if (-not $plugin) {
+            Write-Error "No se encontró MiniKomodo.vst3 dentro de build."
+            Get-ChildItem -Path "build" -Recurse | Select-Object -ExpandProperty FullName
+            exit 1
+          }
+
+          New-Item -ItemType Directory -Force -Path "dist" | Out-Null
+          Compress-Archive -Path $plugin.FullName -DestinationPath "dist/MiniKomodo-Windows-VST3.zip" -Force
+
+      - name: Upload VST3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiniKomodo-Windows-VST3
+          path: dist/MiniKomodo-Windows-VST3.zip
+          if-no-files-found: error
