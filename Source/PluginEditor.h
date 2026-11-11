@@ -10,6 +10,19 @@ public:
           kb (p.keyboardState, juce::MidiKeyboardComponent::horizontalKeyboard)
     {
         const auto orange = juce::Colour (0xffff9a2e);
+
+        for (int i = 0; i < p.getNumPrograms(); ++i) presetBox.addItem (p.getProgramName (i), i + 1);
+        presetBox.setSelectedItemIndex (p.getCurrentProgram(), juce::dontSendNotification);
+        presetBox.onChange = [this, &p] { p.setCurrentProgram (presetBox.getSelectedItemIndex()); };
+        auto presetLab = std::make_unique<juce::Label> (juce::String(), "Preset");
+        presetLab->setJustificationType (juce::Justification::centred);
+        presetLab->setColour (juce::Label::textColourId, juce::Colour (0xffb09c78));
+        presetLab->setFont (juce::FontOptions (12.f));
+        presetLab->attachToComponent (&presetBox, false);
+        addAndMakeVisible (presetBox);
+        addAndMakeVisible (*presetLab);
+        labels.push_back (std::move (presetLab));
+
         for (int i = 0; i < NP; ++i)
         {
             auto* par = p.apvts.getParameter (paramIds[i]);
@@ -84,6 +97,8 @@ public:
             combos[i]->setBounds (row.getX() + col * cw + 4, row.getY(), cw - 8, 24);
         }
 
+        presetBox.setBounds (row2.getX() + 3 * cw + 4, row2.getY(), cw * 3 - 8, 24);   // columnas 4-6 de la fila 2
+
         kb.setBounds (r.removeFromBottom (100));
 
         const int cols = 8, cellW = r.getWidth() / cols, cellH = 112;
@@ -96,6 +111,7 @@ public:
 private:
     int cells = 0;
     juce::MidiKeyboardComponent kb;
+    juce::ComboBox presetBox;
     std::vector<std::unique_ptr<juce::Label>> labels;
     std::vector<std::unique_ptr<juce::ComboBox>> combos;
     std::vector<std::unique_ptr<juce::Slider>> knobs;

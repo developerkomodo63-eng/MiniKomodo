@@ -28,6 +28,49 @@ float wave (int w, float t, float dt)
         }
     }
 }
+
+struct Ov { int id; float v; };
+struct Preset { const char* name; std::vector<Ov> ov; };
+
+// Rangos: 0=32' 1=16' 2=8' 3=4' 4=2'.  Ondas: 0 tri, 1 sierra, 2 sierra inv, 3 cuadrada, 4 pulso ancho, 5 pulso angosto.
+// MODE: 0 poly, 1 mono.  DEC=0 -> release corto (15 ms); DEC=1 -> release = tiempo de decay.
+const std::vector<Preset>& presets()
+{
+    static const std::vector<Preset> p = {
+        { "Init", {} },
+        // ---- Bass (clasicos tipo Minimoog)
+        { "Moog Bass",       { {R0,1}, {W0,1}, {R1,1}, {W1,3}, {D1,4}, {R2,0}, {W2,0}, {L0,1}, {L1,.8f}, {L2,.6f}, {CUT,350}, {RES,.35f}, {AMT,.6f}, {KEY,.3f}, {FA,0}, {FD,.25f}, {FS,.2f}, {AA,0}, {AD,.3f}, {AS,.9f}, {DEC,0}, {MODE,1}, {VOL,0.870f} } },
+        { "Fat Moog Bass",   { {R0,1}, {W0,1}, {R1,1}, {W1,1}, {D1,7}, {R2,0}, {W2,1}, {D2,-6}, {L0,1}, {L1,.9f}, {L2,.8f}, {CUT,280}, {RES,.3f}, {AMT,.7f}, {KEY,.3f}, {FD,.3f}, {FS,.15f}, {AD,.3f}, {AS,.9f}, {DEC,0}, {GL,.08f}, {MODE,1}, {VOL,0.746f} } },
+        { "Sub Bass",        { {R0,0}, {W0,0}, {R1,1}, {W1,0}, {L0,1}, {L1,.5f}, {L2,0}, {CUT,220}, {RES,.1f}, {AMT,.2f}, {KEY,0}, {FD,.2f}, {FS,.8f}, {AD,.3f}, {AS,.9f}, {DEC,0}, {MODE,1}, {VOL,0.991f} } },
+        { "Rubber Bass",     { {R0,1}, {W0,1}, {R1,1}, {W1,3}, {D1,5}, {L0,.9f}, {L1,.7f}, {L2,0}, {CUT,200}, {RES,.5f}, {AMT,.9f}, {KEY,.3f}, {FD,.15f}, {FS,0}, {AD,.2f}, {AS,.4f}, {DEC,0}, {MODE,1}, {VOL,1.000f} } },
+        { "Funk Bass",       { {R0,1}, {W0,4}, {R1,1}, {W1,1}, {D1,4}, {L0,1}, {L1,.6f}, {L2,0}, {CUT,300}, {RES,.4f}, {AMT,.85f}, {KEY,.4f}, {FD,.12f}, {FS,.1f}, {AD,.18f}, {AS,.5f}, {DEC,0}, {MODE,1}, {VOL,1.000f} } },
+        { "Taurus Bass",     { {R0,0}, {W0,1}, {R1,0}, {W1,3}, {L0,1}, {L1,.8f}, {L2,0}, {CUT,160}, {RES,.55f}, {AMT,.5f}, {KEY,.2f}, {FD,.4f}, {FS,.3f}, {AD,.4f}, {AS,.9f}, {DEC,0}, {MODE,1}, {VOL,1.000f} } },
+        { "Acid Bass",       { {R0,1}, {W0,1}, {L0,1}, {L1,0}, {L2,0}, {CUT,250}, {RES,.8f}, {AMT,.85f}, {KEY,.2f}, {FD,.22f}, {FS,0}, {AD,.25f}, {AS,.6f}, {DEC,0}, {GL,.1f}, {MODE,1}, {VOL,1.000f} } },
+        // ---- Lead (clasicos)
+        { "Moog Lead",       { {R0,2}, {W0,1}, {R1,2}, {W1,1}, {D1,6}, {R2,1}, {W2,3}, {D2,-5}, {L0,1}, {L1,.8f}, {L2,.5f}, {CUT,2500}, {RES,.3f}, {AMT,.3f}, {KEY,.8f}, {FD,.35f}, {FS,.6f}, {AS,.9f}, {DEC,0}, {GL,.12f}, {LA,.05f}, {LR,.45f}, {MODE,1}, {VOL,0.790f} } },
+        { "Prog Lead",       { {R0,2}, {W0,1}, {R1,2}, {W1,1}, {D1,8}, {R2,3}, {W2,1}, {D2,-10}, {L0,1}, {L1,.7f}, {L2,.3f}, {CUT,4000}, {RES,.25f}, {AMT,.25f}, {KEY,.8f}, {FD,.35f}, {FS,.6f}, {AS,.9f}, {DEC,0}, {GL,.15f}, {LA,.08f}, {LR,.5f}, {MODE,1}, {VOL,0.848f} } },
+        { "Screamer Lead",   { {R0,2}, {W0,4}, {R1,2}, {W1,1}, {D1,12}, {L0,1}, {L1,.9f}, {L2,0}, {CUT,5000}, {RES,.5f}, {AMT,.5f}, {KEY,.8f}, {FD,.3f}, {FS,.5f}, {AS,.9f}, {DEC,0}, {LA,.1f}, {MODE,1}, {VOL,0.925f} } },
+        { "Flute Lead",      { {R0,2}, {W0,0}, {R1,3}, {W1,0}, {D1,3}, {L0,1}, {L1,.4f}, {L2,0}, {NZ,.04f}, {CUT,2200}, {RES,.1f}, {AMT,.2f}, {KEY,.7f}, {AA,.12f}, {AS,.9f}, {DEC,0}, {LA,.15f}, {LR,.4f}, {GL,.1f}, {MODE,1}, {VOL,1.000f} } },
+        { "Square Lead",     { {R0,2}, {W0,3}, {R1,2}, {W1,3}, {D1,6}, {L0,1}, {L1,.8f}, {L2,0}, {CUT,3500}, {RES,.2f}, {AMT,.3f}, {KEY,.8f}, {AS,.9f}, {DEC,0}, {CHO,1}, {MODE,1}, {VOL,0.817f} } },
+        { "Sync-ish Lead",   { {R0,2}, {W0,5}, {R1,3}, {W1,1}, {D1,15}, {L0,1}, {L1,.8f}, {L2,0}, {CUT,6000}, {RES,.45f}, {AMT,.6f}, {KEY,.7f}, {FD,.25f}, {FS,.5f}, {AS,.9f}, {DEC,0}, {LA,.12f}, {LR,.55f}, {GL,.06f}, {MODE,1}, {VOL,0.953f} } },
+        // ---- Brass / Pad / Strings
+        { "Moog Brass",      { {R0,2}, {W0,1}, {R1,2}, {W1,1}, {D1,5}, {R2,2}, {W2,1}, {D2,-5}, {L0,1}, {L1,.8f}, {L2,.7f}, {CUT,600}, {RES,.15f}, {AMT,.75f}, {KEY,.5f}, {FA,.08f}, {FD,.35f}, {FS,.6f}, {AA,.05f}, {AD,.3f}, {AS,.9f}, {DEC,0}, {VOL,0.449f} } },
+        { "Brass Stab",      { {R0,2}, {W0,1}, {R1,2}, {W1,1}, {D1,6}, {L0,1}, {L1,.8f}, {L2,0}, {CUT,500}, {RES,.2f}, {AMT,.85f}, {KEY,.5f}, {FA,0}, {FD,.2f}, {FS,.25f}, {AA,0}, {AD,.25f}, {AS,.6f}, {DEC,0}, {VOL,0.552f} } },
+        { "Moog Pad",        { {R0,2}, {W0,1}, {R1,2}, {W1,1}, {D1,8}, {R2,2}, {W2,1}, {D2,-8}, {L0,.8f}, {L1,.8f}, {L2,.8f}, {CUT,900}, {RES,.15f}, {AMT,.3f}, {KEY,.5f}, {FA,.35f}, {FD,.5f}, {FS,.7f}, {AA,.45f}, {AD,.5f}, {AS,.9f}, {DEC,1}, {LA,.05f}, {LR,.2f}, {CHO,2}, {VOL,0.634f} } },
+        { "Strings",         { {R0,2}, {W0,1}, {R1,2}, {W1,1}, {D1,7}, {R2,3}, {W2,1}, {D2,-7}, {L0,.8f}, {L1,.8f}, {L2,.5f}, {CUT,2500}, {RES,.1f}, {AMT,.15f}, {KEY,.6f}, {FA,.3f}, {FD,.5f}, {FS,.8f}, {AA,.35f}, {AD,.5f}, {AS,.9f}, {DEC,1}, {LA,.08f}, {LR,.3f}, {CHO,2}, {VOL,0.589f} } },
+        { "Dark Pad",        { {R0,1}, {W0,1}, {R1,2}, {W1,3}, {D1,6}, {R2,2}, {W2,1}, {D2,-6}, {L0,.8f}, {L1,.7f}, {L2,.7f}, {CUT,500}, {RES,.25f}, {AMT,.5f}, {KEY,.3f}, {FA,.6f}, {FD,.6f}, {FS,.5f}, {AA,.5f}, {AD,.5f}, {AS,.9f}, {DEC,1}, {LFF,.1f}, {LR,.15f}, {CHO,2}, {VOL,0.668f} } },
+        // ---- Keys / Pluck
+        { "Square Organ",    { {R0,2}, {W0,3}, {R1,3}, {W1,3}, {R2,4}, {W2,3}, {L0,1}, {L1,.6f}, {L2,.4f}, {CUT,6000}, {RES,0}, {AMT,0}, {KEY,.5f}, {FS,1}, {AA,0}, {AD,0}, {AS,1}, {DEC,0}, {CHO,3}, {VOL,0.496f} } },
+        { "Clav",            { {R0,2}, {W0,5}, {R1,2}, {W1,4}, {D1,6}, {L0,1}, {L1,.5f}, {L2,0}, {CUT,1500}, {RES,.3f}, {AMT,.6f}, {KEY,.8f}, {FD,.15f}, {FS,0}, {AD,.15f}, {AS,0}, {DEC,0}, {VOL,0.603f} } },
+        { "Electric Piano",  { {R0,2}, {W0,0}, {R1,3}, {W1,3}, {D1,3}, {L0,1}, {L1,.3f}, {L2,0}, {CUT,1800}, {RES,.1f}, {AMT,.4f}, {KEY,.7f}, {FD,.35f}, {FS,.15f}, {AD,.4f}, {AS,.3f}, {DEC,1}, {CHO,1}, {VOL,0.869f} } },
+        { "Moog Pluck",      { {R0,2}, {W0,1}, {R1,2}, {W1,1}, {D1,5}, {L0,1}, {L1,.7f}, {L2,0}, {CUT,800}, {RES,.3f}, {AMT,.8f}, {KEY,.6f}, {FD,.2f}, {FS,0}, {AD,.22f}, {AS,0}, {DEC,1}, {VOL,0.671f} } },
+        { "Marimba",         { {R0,2}, {W0,0}, {R1,4}, {W1,0}, {L0,1}, {L1,.3f}, {L2,0}, {CUT,900}, {RES,.2f}, {AMT,.6f}, {KEY,.9f}, {FD,.15f}, {FS,0}, {AD,.18f}, {AS,0}, {DEC,1}, {VOL,0.885f} } },
+        // ---- FX
+        { "Wind Sweep",      { {L0,0}, {L1,0}, {L2,0}, {NZ,1}, {CUT,800}, {RES,.6f}, {AMT,.4f}, {KEY,0}, {FA,.6f}, {FD,.6f}, {FS,.6f}, {AA,.5f}, {AD,.5f}, {AS,.9f}, {DEC,1}, {LFF,.5f}, {LR,.15f}, {CHO,1}, {VOL,1.000f} } },
+        { "S&H Bleeps",      { {R0,2}, {W0,1}, {R1,2}, {W1,3}, {D1,7}, {L0,1}, {L1,.6f}, {L2,0}, {CUT,1200}, {RES,.55f}, {AMT,.2f}, {KEY,.4f}, {FD,.2f}, {FS,.5f}, {AS,.9f}, {DEC,0}, {LSH,3}, {LFF,.8f}, {LR,.6f}, {MODE,1}, {VOL,0.950f} } },
+    };
+    return p;
+}
 } // namespace
 
 using APF = juce::AudioParameterFloat;
@@ -83,6 +126,28 @@ void MiniKomodoAudioProcessor::prepareToPlay (double s, int)
     for (auto& v : voices) v = Voice();
     nHeld = 0; sustain = false; lfoPh = 0.f; bend = 0.f;
     lastMode = mode = (int) pp[MODE]->load();
+}
+
+// ---------------------------------------------------------------- programas (presets)
+int MiniKomodoAudioProcessor::getNumPrograms() { return (int) presets().size(); }
+
+const juce::String MiniKomodoAudioProcessor::getProgramName (int i)
+{
+    const auto& p = presets();
+    return (i >= 0 && i < (int) p.size()) ? juce::String (p[(size_t) i].name) : juce::String();
+}
+
+void MiniKomodoAudioProcessor::setCurrentProgram (int i)
+{
+    const auto& all = presets();
+    if (i < 0 || i >= (int) all.size() || i == curProg) return;
+    curProg = i;
+    float val[NP];
+    for (int k = 0; k < NP; ++k) val[k] = kDefault[k];
+    for (auto& o : all[(size_t) i].ov) val[o.id] = o.v;
+    for (int k = 0; k < NP; ++k)
+        if (auto* par = apvts.getParameter (paramIds[k]))
+            par->setValueNotifyingHost (par->convertTo0to1 (val[k]));
 }
 
 // ---------------------------------------------------------------- MIDI / voces
@@ -282,12 +347,18 @@ juce::AudioProcessorEditor* MiniKomodoAudioProcessor::createEditor() { return ne
 
 void MiniKomodoAudioProcessor::getStateInformation (juce::MemoryBlock& d)
 {
-    if (auto xml = apvts.copyState().createXml()) copyXmlToBinary (*xml, d);
+    auto st = apvts.copyState();
+    st.setProperty ("prog", curProg, nullptr);
+    if (auto xml = st.createXml()) copyXmlToBinary (*xml, d);
 }
 void MiniKomodoAudioProcessor::setStateInformation (const void* d, int sz)
 {
     if (auto xml = getXmlFromBinary (d, sz))
-        if (xml->hasTagName (apvts.state.getType())) apvts.replaceState (juce::ValueTree::fromXml (*xml));
+        if (xml->hasTagName (apvts.state.getType()))
+        {
+            curProg = juce::jlimit (0, getNumPrograms() - 1, xml->getIntAttribute ("prog", 0));
+            apvts.replaceState (juce::ValueTree::fromXml (*xml));
+        }
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new MiniKomodoAudioProcessor(); }

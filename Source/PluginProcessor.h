@@ -45,10 +45,10 @@ public:
     bool acceptsMidi() const override { return true; }
     bool producesMidi() const override { return false; }
     double getTailLengthSeconds() const override { return 0.0; }
-    int getNumPrograms() override { return 1; }
-    int getCurrentProgram() override { return 0; }
-    void setCurrentProgram (int) override {}
-    const juce::String getProgramName (int) override { return {}; }
+    int getNumPrograms() override;
+    int getCurrentProgram() override { return curProg; }
+    void setCurrentProgram (int) override;
+    const juce::String getProgramName (int) override;
     void changeProgramName (int, const juce::String&) override {}
     void getStateInformation (juce::MemoryBlock&) override;
     void setStateInformation (const void*, int) override;
@@ -68,7 +68,7 @@ private:
     std::atomic<float>* pp[NP] {};
     Voice voices[kVoices];
     Chorus chorus;
-    int held[32] {}, nHeld = 0, mode = 0, lastMode = 0, cho = 0, lsh = 0, wf[3] {};
+    int held[32] {}, nHeld = 0, curProg = 0, mode = 0, lastMode = 0, cho = 0, lsh = 0, wf[3] {};
     unsigned ageCounter = 0, rngState = 22222u, shState = 777u;
     bool sustain = false;
     double sr = 44100.0;

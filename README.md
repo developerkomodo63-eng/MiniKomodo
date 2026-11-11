@@ -4,8 +4,8 @@ Dos sintetizadores livianos de Developer Komodo, en el mismo repositorio y con e
 
 | Plugin | Qué es |
 |---|---|
-| **MiniKomodo** | Estilo Minimoog: 3 osciladores, filtro ladder 24 dB, 2 envolventes, LFO (4 formas), chorus. Modo **Poly** (6 voces) o **Mono** legato con glide. |
-| **PolyKomodo** | Estilo Juno: saw + pulso (PWM) + sub + ruido, HPF, filtro 24 dB, 2 ADSR, LFO, chorus I/II, 6 voces, 20 presets (Bass, Lead, Pad, Brass). |
+| **MiniKomodo** | Estilo Minimoog: 3 osciladores, filtro ladder 24 dB, 2 envolventes, LFO (4 formas), chorus. Modo **Poly** (6 voces) o **Mono** legato con glide. 25 presets clásicos (bajos Moog, leads, brass, pads, strings, keys, plucks, FX). |
+| **PolyKomodo** | Estilo Juno: saw + pulso (PWM) + sub + ruido, HPF, filtro 24 dB, 2 ADSR, LFO, chorus I/II, 6 voces, 35 presets (Bass, Lead, Pad, Brass, Keys, Pluck). |
 
 Ambos responden a pitch bend (±2 st), mod wheel (vibrato) y pedal de sustain.
 
