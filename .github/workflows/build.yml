@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build-windows-vst3:
-    name: Build Windows VST3 (MiniKomodo + PolyKomodo)
+    name: Build Windows VST3 (Mini, Poly, Keys)
     runs-on: windows-latest
 
     steps:
@@ -30,21 +30,19 @@ jobs:
         run: |
           cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build VST3 (MiniKomodo)
+      - name: Build VST3 (5 plugins)
         shell: pwsh
         run: |
-          cmake --build build --config Release --target MiniKomodo_VST3 --parallel
-
-      - name: Build VST3 (PolyKomodo)
-        shell: pwsh
-        run: |
-          cmake --build build --config Release --target PolyKomodo_VST3 --parallel
+          foreach ($t in @("MiniKomodo", "MiniKomodoLite", "PolyKomodo", "PolyKomodoLite", "KeysKomodo")) {
+            cmake --build build --config Release --target "${t}_VST3" --parallel
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
 
       - name: Collect VST3
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path "dist" | Out-Null
-          foreach ($name in @("MiniKomodo", "PolyKomodo")) {
+          foreach ($name in @("MiniKomodo", "MiniKomodo Lite", "PolyKomodo", "PolyKomodo Lite", "KeysKomodo")) {
             $plugin = Get-ChildItem -Path "build" -Recurse -Directory -Filter "*.vst3" |
               Where-Object { $_.Name -eq "$name.vst3" } |
               Select-Object -First 1
@@ -54,7 +52,8 @@ jobs:
               Get-ChildItem -Path "build" -Recurse | Select-Object -ExpandProperty FullName
               exit 1
             }
-            Compress-Archive -Path $plugin.FullName -DestinationPath "dist/$name-Windows-VST3.zip" -Force
+            $zip = $name.Replace(' ', '')
+            Compress-Archive -Path $plugin.FullName -DestinationPath "dist/$zip-Windows-VST3.zip" -Force
           }
 
       - name: Upload VST3 artifacts

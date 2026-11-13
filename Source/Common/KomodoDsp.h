@@ -79,6 +79,104 @@ V* allocateVoice (V (&voices)[N], int note) noexcept
     return best;
 }
 
+
+// ---------------------------------------------------------------- arpegiador (solo genera notas MIDI: costo ~0)
+struct Arp
+{
+    int mode = 0;                       // 0 off, 1 up, 2 down, 3 up/down, 4 random, 5 played
+    int octaves = 1;
+    double stepLen = 5000.0, gateLen = 3000.0, toNext = 0.0;
+    int held[16] {}, nHeld = 0, seq[64] {}, seqLen = 0, idx = 0, dir = 1, playing = -1;
+    bool gateOn = false;
+    float vel = 1.f;
+    unsigned rnd = 12345u;
+
+    void setTiming (double bpm, int rateIdx, float gate, double sr) noexcept
+    {
+        static const double beats[6] { 1.0, 0.5, 1.0 / 3.0, 0.25, 1.0 / 6.0, 0.125 };
+        stepLen = juce::jmax (8.0, sr * 60.0 / juce::jmax (20.0, bpm) * beats[juce::jlimit (0, 5, rateIdx)]);
+        gateLen = juce::jlimit (1.0, stepLen - 1.0, stepLen * (double) gate);
+    }
+
+    void rebuild() noexcept
+    {
+        int tmp[16];
+        for (int i = 0; i < nHeld; ++i) tmp[i] = held[i];
+        if (mode != 5) std::sort (tmp, tmp + nHeld);
+        seqLen = 0;
+        for (int o = 0; o < octaves; ++o)
+            for (int i = 0; i < nHeld; ++i)
+            {
+                const int n = tmp[i] + 12 * o;
+                if (n <= 127 && seqLen < 64) seq[seqLen++] = n;
+            }
+        if (mode == 2) std::reverse (seq, seq + seqLen);
+        if (idx >= seqLen) idx = 0;
+    }
+
+    void noteOn (int n) noexcept
+    {
+        for (int i = 0; i < nHeld; ++i) if (held[i] == n) return;
+        const bool first = nHeld == 0;
+        if (nHeld < 16) held[nHeld++] = n;
+        rebuild();
+        if (first) { idx = 0; dir = 1; toNext = 0.0; }          // arranca de inmediato con la primera nota
+    }
+
+    template <class F> void noteOff (int n, F&& send) noexcept
+    {
+        for (int i = 0; i < nHeld; ++i)
+            if (held[i] == n) { for (int k = i; k < nHeld - 1; ++k) held[k] = held[k + 1]; --nHeld; break; }
+        rebuild();
+        if (nHeld == 0 && gateOn) { send (false, playing); gateOn = false; playing = -1; }
+    }
+
+    template <class F> void stop (F&& send) noexcept
+    {
+        if (gateOn) send (false, playing);
+        gateOn = false; playing = -1; nHeld = 0; seqLen = 0; idx = 0; dir = 1;
+    }
+
+    int take() noexcept
+    {
+        if (seqLen == 0) return -1;
+        if (idx < 0 || idx >= seqLen) idx = 0;
+        const int note = seq[idx];
+        if (mode == 4) { rnd ^= rnd << 13; rnd ^= rnd >> 17; rnd ^= rnd << 5; idx = (int) ((rnd >> 8) % (unsigned) seqLen); }
+        else if (mode == 3 && seqLen > 1)
+        {
+            idx += dir;
+            if (idx >= seqLen)     { idx = seqLen - 2; dir = -1; }
+            else if (idx < 0)      { idx = 1; dir = 1; }
+        }
+        else idx = (idx + 1) % seqLen;
+        return note;
+    }
+
+    // dispara los eventos que ya tocan; send(bool on, int note)
+    template <class F> void fire (F&& send) noexcept
+    {
+        while (toNext < 1.0)
+        {
+            if (! gateOn)
+            {
+                const int n = take();
+                if (n < 0) { toNext += stepLen; continue; }
+                send (true, n);
+                playing = n; gateOn = true; toNext += gateLen;
+            }
+            else
+            {
+                send (false, playing);
+                playing = -1; gateOn = false; toNext += stepLen - gateLen;
+            }
+        }
+    }
+
+    int maxChunk() const noexcept { return juce::jmax (1, (int) std::floor (toNext)); }
+    void advance (int n) noexcept { toNext -= (double) n; }
+};
+
 // ---------------------------------------------------------------- chorus (linea de retardo corta)
 struct Chorus
 {
