@@ -6,7 +6,7 @@ namespace
 // valores por defecto, en el mismo orden que el enum
 const float kDefault[NP] = {
     0.f, 1.f, .02f, .55f, 0.f, .3f, .6f, 0.f, .4f,                    // ENG RNG ATK DEC SUS REL VEL VIB VBR
-    0.f, .32f, .6f, .45f, .3f, .2f,                                   // FMR FMI FMV FMD TNE BRK
+    0.f, .4f, .85f, .6f, .4f, .3f,                                    // FMR FMI FMV FMD TNE BRK
     1.f, 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, .2f,           // DB0..DB8 PRC CLK
     0.f, .3f, 3000.f, .1f, .2f, .35f, .5f,                            // WAV ENS CUT RES FEA FDC KEY
     0.f, .15f,                                                        // VOW BRT
@@ -61,17 +61,17 @@ const std::vector<Preset>& presets()
     static const std::vector<Preset> p = {
         { "Init", {} },
         // ---- Pianos electricos (FM)
-        { "EP Suitcase Rhodes",  { {FMI,.32f}, {FMV,.6f}, {FMD,.45f}, {TNE,.35f}, {BRK,.25f}, {DEC,.6f}, {REL,.25f}, {VEL,.7f}, {MOD,4}, {MDR,.45f}, {MDD,.5f}, {DRV,.15f}, {RVM,.15f}, {VOL,0.456f} } },
-        { "EP Stage Rhodes Bark",{ {FMI,.42f}, {FMV,.8f}, {FMD,.4f}, {TNE,.45f}, {BRK,.7f}, {DEC,.6f}, {REL,.22f}, {VEL,.8f}, {MOD,1}, {MDD,.3f}, {DRV,.25f}, {RVM,.12f}, {VOL,0.501f} } },
-        { "EP Mark I Soft",      { {FMI,.22f}, {FMV,.4f}, {FMD,.5f}, {TNE,.2f}, {BRK,.1f}, {DEC,.65f}, {REL,.3f}, {MOD,1}, {MDD,.2f}, {RVM,.2f}, {VOL,0.495f} } },
-        { "EP Wurly",            { {FMR,1}, {FMI,.3f}, {FMV,.6f}, {FMD,.35f}, {TNE,.1f}, {BRK,.55f}, {DEC,.5f}, {REL,.2f}, {MOD,4}, {MDR,.35f}, {MDD,.35f}, {DRV,.2f}, {VOL,0.477f} } },
-        { "EP DX Classic",       { {FMI,.4f}, {FMV,.7f}, {FMD,.35f}, {TNE,.6f}, {BRK,0}, {DEC,.65f}, {REL,.3f}, {MOD,1}, {MDD,.6f}, {RVM,.2f}, {VOL,0.482f} } },
-        { "EP Dream Phase",      { {FMI,.3f}, {FMV,.5f}, {FMD,.5f}, {TNE,.3f}, {DEC,.7f}, {REL,.4f}, {MOD,3}, {MDR,.25f}, {MDD,.6f}, {DLM,.25f}, {RVM,.3f}, {VOL,0.445f} } },
+        { "EP Suitcase Rhodes",  { {FMI,.40f}, {FMV,.85f}, {FMD,.6f}, {TNE,.4f}, {BRK,.3f}, {DEC,.7f}, {REL,.25f}, {VEL,.7f}, {MOD,4}, {MDR,.45f}, {MDD,.5f}, {DRV,.15f}, {RVM,.15f}, {VOL,0.350f} } },
+        { "EP Stage Rhodes Bark",{ {FMI,.45f}, {FMV,1}, {FMD,.55f}, {TNE,.5f}, {BRK,.65f}, {DEC,.7f}, {REL,.22f}, {VEL,.8f}, {MOD,1}, {MDD,.3f}, {DRV,.25f}, {RVM,.12f}, {VOL,0.424f} } },
+        { "EP Mark I Soft",      { {FMI,.30f}, {FMV,.7f}, {FMD,.6f}, {TNE,.25f}, {BRK,.1f}, {DEC,.72f}, {REL,.3f}, {MOD,1}, {MDD,.2f}, {RVM,.2f}, {VOL,0.456f} } },
+        { "EP Wurly",            { {FMR,0}, {FMI,.42f}, {FMV,.8f}, {FMD,.4f}, {TNE,.1f}, {BRK,.6f}, {DEC,.55f}, {REL,.2f}, {MOD,4}, {MDR,.35f}, {MDD,.35f}, {DRV,.2f}, {VOL,0.382f} } },
+        { "EP DX Classic",       { {FMI,.42f}, {FMV,.9f}, {FMD,.5f}, {TNE,.7f}, {BRK,0}, {DEC,.7f}, {REL,.3f}, {MOD,1}, {MDD,.6f}, {RVM,.2f}, {VOL,0.471f} } },
+        { "EP Dream Phase",      { {FMI,.36f}, {FMV,.8f}, {FMD,.65f}, {TNE,.35f}, {DEC,.75f}, {REL,.4f}, {MOD,3}, {MDR,.25f}, {MDD,.6f}, {DLM,.25f}, {RVM,.3f}, {VOL,0.350f} } },
         // ---- Mallets / Bells (FM)
-        { "Bell Vibraphone",     { {FMR,4}, {FMI,.15f}, {FMV,.3f}, {FMD,.3f}, {TNE,0}, {BRK,0}, {DEC,.6f}, {REL,.5f}, {MOD,4}, {MDR,.5f}, {MDD,.45f}, {RVM,.25f}, {VOL,0.446f} } },
-        { "Bell Marimba",        { {FMR,3}, {FMI,.12f}, {FMV,.3f}, {FMD,.12f}, {TNE,0}, {BRK,0}, {DEC,.35f}, {REL,.15f}, {RVM,.15f}, {VOL,0.472f} } },
-        { "Bell Glass",          { {RNG,2}, {FMR,6}, {FMI,.25f}, {FMV,.4f}, {FMD,.5f}, {TNE,.5f}, {BRK,0}, {DEC,.75f}, {REL,.6f}, {DLM,.2f}, {RVM,.35f}, {VOL,0.445f} } },
-        { "Bell Music Box",      { {RNG,2}, {FMR,3}, {FMI,.2f}, {FMV,.3f}, {FMD,.2f}, {TNE,.1f}, {BRK,0}, {DEC,.45f}, {REL,.4f}, {RVM,.3f}, {VOL,0.455f} } },
+        { "Bell Vibraphone",     { {FMR,4}, {FMI,.15f}, {FMV,.3f}, {FMD,.3f}, {TNE,0}, {BRK,0}, {DEC,.6f}, {REL,.5f}, {MOD,4}, {MDR,.5f}, {MDD,.45f}, {RVM,.25f}, {VOL,0.384f} } },
+        { "Bell Marimba",        { {FMR,3}, {FMI,.12f}, {FMV,.3f}, {FMD,.12f}, {TNE,0}, {BRK,0}, {DEC,.35f}, {REL,.15f}, {RVM,.15f}, {VOL,0.440f} } },
+        { "Bell Glass",          { {RNG,2}, {FMR,6}, {FMI,.25f}, {FMV,.4f}, {FMD,.5f}, {TNE,.5f}, {BRK,0}, {DEC,.75f}, {REL,.6f}, {DLM,.2f}, {RVM,.35f}, {VOL,0.387f} } },
+        { "Bell Music Box",      { {RNG,2}, {FMR,3}, {FMI,.2f}, {FMV,.3f}, {FMD,.2f}, {TNE,.1f}, {BRK,0}, {DEC,.45f}, {REL,.4f}, {RVM,.3f}, {VOL,0.414f} } },
         // ---- Organos (drawbars)
         { "ORG B3 Full",         bars ("888888888", { {SUS,1}, {DEC,.5f}, {ATK,0}, {REL,.06f}, {CLK,.25f}, {MOD,5}, {MDD,.7f}, {DRV,.25f}, {RVM,.12f}, {VOL,0.461f} }) },
         { "ORG Jazz 888",        bars ("888000000", { {SUS,1}, {DEC,.5f}, {ATK,0}, {REL,.06f}, {CLK,.3f}, {PRC,2}, {MOD,5}, {MDD,.7f}, {DRV,.15f}, {RVM,.12f}, {VOL,0.479f} }) },
@@ -307,25 +307,30 @@ void KeysKomodoAudioProcessor::renderVoice (Voice& v, float* out, int n)
 
     switch (eng)
     {
-        case 0:   // ---------------- piano electrico: 2 pares FM (cuerpo + tine) + pickup
+        case 0:   // ---------------- piano electrico: 2 pares FM tipo DX7 E.Piano (cuerpo 1:1 + tine 1:14), pickup DESPUES de la envolvente
         {
-            v.envI += (0.18f - v.envI) * fmIdxCoef;
-            v.tineE -= v.tineE * tineCoef;
-            const float vs = 1.f - fmV + fmV * v.vel;
-            const float IA = fmI * 0.55f * vs * v.envI, IB = 0.3f * vs * v.tineE;
-            const float dc = f * invSr, dm = dc * fmRatio, dt = dc * 14.f;
+            // los graves suenan mas brillantes y duran mas; los agudos son mas suaves y se apagan antes (como un piano electrico real)
+            const float kd = juce::jlimit (0.4f, 3.f, std::exp2 ((float) (v.note - 60) * (1.f / 18.f)));
+            const float ks = juce::jlimit (0.35f, 1.6f, std::exp2 (-(float) (v.note - 48) * (1.f / 30.f)));
+            v.envI += (0.45f - v.envI) * juce::jmin (1.f, fmIdxCoef * kd);
+            v.tineE -= v.tineE * juce::jmin (1.f, tineCoef * kd);
+            const float vs = (1.f - fmV) + fmV * std::pow (v.vel, 1.8f);     // velocity curva: tocar suave = timbre mellow, fuerte = brillante
+            const float IA = fmI * 0.48f * vs * ks * v.envI;                  // indice del cuerpo (ciclos): ~3 rad como maximo
+            const float IB = 0.5f * vs * vs * ks * v.tineE;                   // indice del tine: solo suena con velocity alta
+            const float dc = f * invSr, dm = dc * fmRatio, dB = dc * 1.0017f, dt = dB * 14.f;   // 2do portador ~3 cents arriba: brillo/batido
+            const float tn = fmTine * 0.7f * vs * v.tineE;
             const float drive = 1.f + fmBark * vs * 4.f, asym = fmBark * 0.25f, norm = 0.6f / (1.f + fmBark * 1.5f);
-            const float tn = fmTine * v.tineE;
-            float p0 = v.p[0], p1 = v.p[1], p2 = v.p[2];
+            float p0 = v.p[0], p1 = v.p[1], p2 = v.p[2], pB = v.sv[1], dcz = v.sv[0];
             for (int i = 0; i < n; ++i)
             {
-                p0 = wrap1 (p0 + dc);  p1 = wrap1 (p1 + dm);  p2 = wrap1 (p2 + dt);
-                float y = sinLU (Tb, p0 + IA * sinLU (Tb, p1)) + tn * sinLU (Tb, p0 + IB * sinLU (Tb, p2));
-                y = clip3 (y * drive + asym * y * y) * norm;
+                p0 = wrap1 (p0 + dc);  p1 = wrap1 (p1 + dm);  pB = wrap1 (pB + dB);  p2 = wrap1 (p2 + dt);
                 a += da;
-                out[i] += y * a;
+                const float y = (sinLU (Tb, p0 + IA * sinLU (Tb, p1)) + tn * sinLU (Tb, pB + IB * sinLU (Tb, p2))) * a;
+                float yd = clip3 (y * drive + asym * y * y) * norm;             // pickup no lineal: con la nota que se apaga se vuelve limpio
+                dcz += 0.0015f * (yd - dcz);
+                out[i] += yd - dcz;
             }
-            v.p[0] = p0; v.p[1] = p1; v.p[2] = p2;
+            v.p[0] = p0; v.p[1] = p1; v.p[2] = p2; v.sv[1] = pB; v.sv[0] = dcz;
             break;
         }
         case 1:   // ---------------- organo: drawbars aditivos (armonicos sobre una fase base de 16')
